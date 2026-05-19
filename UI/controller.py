@@ -9,13 +9,19 @@ class Controller:
         self._model = model
 
     def fillDDGenre(self):
-        pass
+        generi = self._model.getGeneri()
+        for g in generi:
+            self._view._ddGenre.options.append(ft.dropdown.Option(g))
+
 
     def handleCreaGrafo(self, e):
-        pass
+        gen = self._view._ddGenre.value
+        self._model.creaGrafo(gen)
 
-    def handleCreaGrafo(self,e):
-        pass
+
 
     def handleCammino(self,e):
+        pass
+
+    def filldropdown(self, nodes):
         pass

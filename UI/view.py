@@ -17,6 +17,7 @@ class View(ft.UserControl):
         self.btn_hello = None
         self.txt_result = None
         self.txt_container = None
+        self._ddGenre = None
 
     def load_interface(self):
         # title
