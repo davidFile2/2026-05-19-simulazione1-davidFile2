@@ -17,8 +17,10 @@ class Controller:
     def handleCreaGrafo(self, e):
         gen = self._view._ddGenre.value
         self._model.creaGrafo(gen)
+        best, value= self._model.getInfo()
+        self._view.txt_result.controls.append(ft.Text(f"{best} {value}"))
 
-
+        self._view.update_page()
 
     def handleCammino(self,e):
         pass

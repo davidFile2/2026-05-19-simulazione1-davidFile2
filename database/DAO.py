@@ -31,8 +31,7 @@ class DAO():
         result = []
 
         cursor = conn.cursor(dictionary=True)
-        query = """select g.Name 
-                    from chinook.genre g """
+        query = """select distinct g.Name from genre g order by g.Name"""
 
         cursor.execute(query)
 
@@ -44,38 +43,64 @@ class DAO():
         return result
 
     @staticmethod
-    def getAllNodes(g, idMap):
+    def getAllNodes(self, g):
         conn = DBConnect.get_connection()
 
         result = []
 
         cursor = conn.cursor(dictionary=True)
-        query = """select distinct a.ArtistId 
-                from chinook.track t , chinook.album a, chinook.genre g 
-                where g.Name = %s and t.GenreId = g.GenreId and a.AlbumId  = t.AlbumId """
+        query = """select distinct a.ArtistId, a.Name 
+                    from artist a, genre g, album a2, track t 
+                    where t.GenreId = g.GenreId and g.Name = %s
+                    and t.AlbumId = a2.AlbumId and a2.ArtistId = a.ArtistId """
 
-        cursor.execute(query, (g,))
+        cursor.execute(query, [g])
 
         for row in cursor:
-            result.append(idMap[row["ArtistId"]])
+            result.append(row["Name"])
 
         cursor.close()
         conn.close()
         return result
 
     @staticmethod
-    def getAllNodes(idMap):
+    def getCustomerArt(a, g):
         conn = DBConnect.get_connection()
 
         result = []
 
         cursor = conn.cursor(dictionary=True)
-        query = """ """
+        query = f"""select i.CustomerId, a2.Name, count(*) as ntracks
+                    from invoice i, invoiceline i2, track t, album a, genre g, artist a2 
+                    where i.InvoiceId = i2.InvoiceId and i2.TrackId = t.TrackId 
+                    and t.AlbumId = a.AlbumId and t.GenreId = g.GenreId and g.Name = %s
+                    and a.ArtistId = a2.ArtistId
+                    group by i.CustomerId, a2.ArtistId 
+                """
+        cursor.execute(query, [g])
+
+        for row in cursor:
+            result.append((row["CustomerId"], row["Name"], row["ntracks"]))
+
+        cursor.close()
+        conn.close()
+        return result
+
+    @staticmethod
+    def getAllEdgesV2(a, idMap):
+        conn = DBConnect.get_connection()
+
+        result = []
+
+        cursor = conn.cursor(dictionary=True)
+        query = f"""
+                    """
 
         cursor.execute(query)
 
         for row in cursor:
-            result.append(idMap[row])
+            result.append((idMap[row["CustomerId"]],
+                            idMap[row["ArtistId"]]))
 
         cursor.close()
         conn.close()
